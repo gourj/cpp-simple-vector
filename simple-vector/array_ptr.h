@@ -1,6 +1,8 @@
+#pragma once
+
 #include <cassert>
 #include <cstdlib>
-#include <iostream>
+#include <utility>
 
 template <typename Type>
 class ArrayPtr {
@@ -12,7 +14,7 @@ public:
     // Если size == 0, поле raw_ptr_ должно быть равно nullptr
     explicit ArrayPtr(size_t size) {
         if (size != 0) {
-            raw_ptr_ = new Type[size]{};
+            raw_ptr_ = std::move(new Type[size]{});
         }
     }
 
@@ -30,6 +32,14 @@ public:
 
     // Запрещаем присваивание
     ArrayPtr& operator=(const ArrayPtr&) = delete;
+
+    // Разрешаем перемещение
+    ArrayPtr& operator=(const ArrayPtr&& rhs) {
+        if (this != &rhs) {
+            this->raw_ptr_ = std::move(rhs.raw_ptr_);
+        }
+        return *this;
+    }
 
     // Прекращает владением массивом в памяти, возвращает значение адреса массива
     // После вызова метода указатель на массив должен обнулиться
@@ -67,9 +77,7 @@ public:
 
     // Обменивается значением указателя на массив с объектом other
     void swap(ArrayPtr& other) noexcept {
-        Type* buffer = raw_ptr_;
-        raw_ptr_ = other.Get();
-        other.raw_ptr_ = buffer;
+        std::swap(raw_ptr_, other.raw_ptr_);
     }
 
 private:
