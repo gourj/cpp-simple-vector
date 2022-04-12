@@ -26,6 +26,11 @@ public:
     // Запрещаем копирование
     ArrayPtr(const ArrayPtr&) = delete;
 
+    // Разрешаем перемещение
+    ArrayPtr(ArrayPtr&& other) 
+    : raw_ptr_(std::move(other.raw_ptr_)) {
+    }
+
     ~ArrayPtr() {
         delete[] raw_ptr_;
     }
@@ -34,9 +39,9 @@ public:
     ArrayPtr& operator=(const ArrayPtr&) = delete;
 
     // Разрешаем перемещение
-    ArrayPtr& operator=(const ArrayPtr&& rhs) {
+    ArrayPtr& operator=(ArrayPtr&& rhs) {
         if (this != &rhs) {
-            this->raw_ptr_ = std::move(rhs.raw_ptr_);
+            std::swap(raw_ptr_, rhs.raw_ptr_);
         }
         return *this;
     }
