@@ -29,6 +29,7 @@ public:
     // Разрешаем перемещение
     ArrayPtr(ArrayPtr&& other) 
     : raw_ptr_(std::move(other.raw_ptr_)) {
+        other.raw_ptr_ = nullptr;
     }
 
     ~ArrayPtr() {
